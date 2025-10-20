@@ -14,4 +14,3 @@
 - 수작업으로 모음
 ## 2-5. training model
 - diffusion model
-# 3. paper URL
