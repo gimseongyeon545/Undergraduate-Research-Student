@@ -1,5 +1,5 @@
 # 1. related work (with paper)
-# 2. our works
+# 2. Contents for our works
 ## 2-1. environment
 - Ubuntu 22.04
 ## 2-2. settings
@@ -14,3 +14,4 @@
 - 수작업으로 모음
 ## 2-5. training model
 - diffusion model
+# 3. paper URL
