@@ -28,7 +28,7 @@ except Exception:
 from gen3lite_teleop_wo_servo.resnet_mlp import JointKeyframeRegressor
 
 
-# ================== DH / FK (너가 준 그대로) ==================
+# ================== DH / FK ==================
 USE_MODIFIED_DH = False
 DH_ALPHA = np.array([np.pi/2, np.pi, np.pi/2, np.pi/2, np.pi/2, 0.0], dtype=float)
 DH_A     = np.array([0.0,     0.28,  0.0,     0.0,     0.0,     0.0 ], dtype=float)
@@ -106,7 +106,7 @@ class FKTree:
             path.append(cur)
         return path  # start -> ... -> root
 
-# ====== 너가 준 노드(q는 라디안 가정; joint 순서는 질문의 joint_name 순서) ======
+
 NODES_Q = {
     "p1":  np.array([-0.2736046482792531, -0.653531209389957,  1.529001741911629,  1.0971962701339633, 1.3695114158133996, -1.8006367162486585], dtype=np.float32),
     "p3":  np.array([ 0.10184940009677237,-0.502113457187976,  1.5133450178630534, 0.9870524548221392, 1.6398632791372294, -1.4142051178593276], dtype=np.float32),
