@@ -1,0 +1,2 @@
+- diffusers hugging face documents (source code)
+  - https://github.com/huggingface/diffusers/tree/main/src/diffusers
