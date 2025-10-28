@@ -150,3 +150,5 @@
     - diffusion policy paper의 2.3 Diffudion for visuomotor policy learning 에서 "closed-loop action-sequence prediction"
     - $$T_o$$: observation horizon, $$T_p$$: predicton horizon, $T_a$: executed horizon
     - 12개 예측 중 6개 행동만 사용하고, obs 의 경우 최근 `obs_horizon` 개수만큼만 사용
+
+# `run_test_transformer_v2.py`
