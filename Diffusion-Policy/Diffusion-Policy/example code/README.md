@@ -59,49 +59,49 @@
     - `TransformerJointGripperNoDQ`
       ```
       입력 (정규화됨)
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ obs_rgb   : [B, K, 3, H, W]   │ obs_depth : [B, K, 1, H, W] │ obs_q : [B, K, 7] │
-└──────────────────────────────────────────────────────────────────────────────┘
-        │                │                         │
-        ▼                ▼                         ▼
-   ConvEncoder(3→img)  ConvEncoder(1→img)    LowDimEncoder(7→q_feat)
-    → feat_rgb          → feat_depth          → feat_q
-    [B, K, img]         [B, K, img]           [B, K, q_feat]
-        │───────────────────┬───────────────────────────│
-                            ▼
-                 concat([feat_rgb, feat_depth, feat_q])   # [B, K, img+img+q_feat]
-                            │
-                            ▼
-                      Fuse MLP (Linear→ReLU→Linear)
-                            │
-                            ▼
-                      tokens_enc : [B, K, D]
-                            │
-                     + PositionalEncoding
-                            │
-                            ▼
-                TransformerEncoder (L_enc layers)
-                            │
-                     memory : [B, K, D]  ← 시간 K의 컨텍스트
-                            │
-                            │            ┌────────────────────────────────────┐
-                            │            │ Learned future queries (파라미터) │
-                            │            │  [T_max, D] → slice [:T] → [B,T,D]│
-                            │            └────────────────────────────────────┘
-                            │                          │
-                            │                     + PosEnc
-                            │                          │
-                            └──────────────►  TransformerDecoder (L_dec)  ◄──────┐
-                                             (tgt=[B,T,D], memory=[B,K,D])       │
-                                                                                  │
-                                         h_dec : [B, T, D]                        │
-                                                │                                  │
-                                                ▼                                  │
-                                        Head MLP (Linear→ReLU→Linear)              │
-                                                │                                  │
-                                                ▼                                  │
-                                   pred_joint : [B, T, 7] → (tanh) → [-1,1]        │
-      ```
+      ┌──────────────────────────────────────────────────────────────────────────────┐
+      │ obs_rgb   : [B, K, 3, H, W]   │ obs_depth : [B, K, 1, H, W] │ obs_q : [B, K, 7] │
+      └──────────────────────────────────────────────────────────────────────────────┘
+              │                │                         │
+              ▼                ▼                         ▼
+         ConvEncoder(3→img)  ConvEncoder(1→img)    LowDimEncoder(7→q_feat)
+          → feat_rgb          → feat_depth          → feat_q
+          [B, K, img]         [B, K, img]           [B, K, q_feat]
+              │───────────────────┬───────────────────────────│
+                                  ▼
+                       concat([feat_rgb, feat_depth, feat_q])   # [B, K, img+img+q_feat]
+                                  │
+                                  ▼
+                            Fuse MLP (Linear→ReLU→Linear)
+                                  │
+                                  ▼
+                            tokens_enc : [B, K, D]
+                                  │
+                           + PositionalEncoding
+                                  │
+                                  ▼
+                      TransformerEncoder (L_enc layers)
+                                  │
+                           memory : [B, K, D]  ← 시간 K의 컨텍스트
+                                  │
+                                  │            ┌────────────────────────────────────┐
+                                  │            │ Learned future queries (파라미터) │
+                                  │            │  [T_max, D] → slice [:T] → [B,T,D]│
+                                  │            └────────────────────────────────────┘
+                                  │                          │
+                                  │                     + PosEnc
+                                  │                          │
+                                  └──────────────►  TransformerDecoder (L_dec)  ◄──────┐
+                                                   (tgt=[B,T,D], memory=[B,K,D])       │
+                                                                                        │
+                                               h_dec : [B, T, D]                        │
+                                                      │                                  │
+                                                      ▼                                  │
+                                              Head MLP (Linear→ReLU→Linear)              │
+                                                      │                                  │
+                                                      ▼                                  │
+                                         pred_joint : [B, T, 7] → (tanh) → [-1,1]        │
+       ```
 
 </br>
 
