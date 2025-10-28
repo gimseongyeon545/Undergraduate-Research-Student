@@ -106,7 +106,7 @@
       - `d_model`: 한 토큰의 임베딩 길이
       - `LowDimEncoder` 에서 하나의 시점 t 에서의 q(7) (=`in_dim`) 을 받아서 `d_model` 만큼의 차원으로 embedding
       - TransformerEncoder & TransformerDecoder
-        - <img width="305" height="434" alt="image" src="https://github.com/user-attachments/assets/1151636b-a84b-41d5-a734-573af4a4ea6a" />
+        > <img width="305" height="434" alt="image" src="https://github.com/user-attachments/assets/1151636b-a84b-41d5-a734-573af4a4ea6a" />
           - `nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward=2048, dropout=0.1, activation=<function relu>, layer_norm_eps=1e-05, batch_first=False, norm_first=False, bias=True, device=None, dtype=None)`
             - `d_model`: Input Embedding layer 에서의 출력 크기
             - `nhead`: Multi-Head Attention 개수
