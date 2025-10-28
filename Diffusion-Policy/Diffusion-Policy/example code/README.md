@@ -59,12 +59,13 @@
     - `TransformerJointGripperNoDQ`
       ```
       입력 (정규화됨)
-      ┌──────────────────────────────────────────────────────────────────────────────┐
+      ┌─────────────────────────────────────────────────────────────────────────────────┐
       │ obs_rgb   : [B, K, 3, H, W]   │ obs_depth : [B, K, 1, H, W] │ obs_q : [B, K, 7] │
-      └──────────────────────────────────────────────────────────────────────────────┘
+      └─────────────────────────────────────────────────────────────────────────────────┘
               │                │                         │
               ▼                ▼                         ▼
          ConvEncoder(3→img)  ConvEncoder(1→img)    LowDimEncoder(7→q_feat)
+         [self.rgb_enc]      [self.depth_enc]      [self.q_enc]
           → feat_rgb          → feat_depth          → feat_q
           [B, K, img]         [B, K, img]           [B, K, q_feat]
               │───────────────────┬───────────────────────────│
@@ -93,15 +94,17 @@
                                   │                          │
                                   └──────────────►  TransformerDecoder (L_dec)  ◄──────┐
                                                    (tgt=[B,T,D], memory=[B,K,D])       │
-                                                                                        │
-                                               h_dec : [B, T, D]                        │
-                                                      │                                  │
-                                                      ▼                                  │
-                                              Head MLP (Linear→ReLU→Linear)              │
-                                                      │                                  │
-                                                      ▼                                  │
-                                         pred_joint : [B, T, 7] → (tanh) → [-1,1]        │
+                                                                                       │
+                                               h_dec : [B, T, D]                       │
+                                                      │                                │
+                                                      ▼                                │
+                                              Head MLP (Linear→ReLU→Linear)            │
+                                                      │                                │
+                                                      ▼                                │
+                                         pred_joint : [B, T, 7] → (tanh) → [-1,1]      │
        ```
+      - `d_model`: 한 토큰의 임베딩 길이
+      - `LowDimEncoder` 에서 하나의 시점 t 에서의 q(7) (=`in_dim`) 을 받아서 `d_model` 만큼의 차원으로 embedding
 
 </br>
 
