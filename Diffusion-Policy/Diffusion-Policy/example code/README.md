@@ -55,7 +55,7 @@
 </br>
 
 - model
-  - Transformer (`transformer.py`)
+  - 1. Transformer (`transformer.py`)
     - `TransformerJointGripperNoDQ`
       ```
       입력 (정규화됨)
@@ -76,7 +76,7 @@
                             Fuse MLP (Linear→ReLU→Linear)
                                   │
                                   ▼
-                            tokens_enc : [B, K, D]
+                            tokens_enc : [B, K, D]    <- 그림의 `Input Embeddings`
                                   │
                            + PositionalEncoding
                                   │
@@ -111,12 +111,31 @@
             - `d_model`: Input Embedding layer 에서의 출력 크기
             - `nhead`: Multi-Head Attention 개수
               - 각 head 별 각 Q,K,V 가중치 존재
-              - input [token 길이 L, d_model] -> head 당 Q,K,V 가중치 dim [d_model, d_model/nhead] -> output Q,K,V dim [L, d_model/nhaed] 
+              - input `[token 길이 L, d_model]` -> head 당 Q,K,V 가중치 dim `[d_model, d_model/nhead]` -> output Q,K,V dim [L, d_model/nhaed] 
               - 하나의 token 에 head 별 가중치를 통해 여러 관점
             - `dim_feedforward`: FFN 내부 dim
-              - FFN: $$W_2 \sigma(W_1x + b_1) + b_2$$
+              - FFN: $$W_2 \sigma(W_1x + b_1) + b_2$$ (transformer 의 ffn 은 2 layers)
           - `nn.TransformerEncoder(encoder_layer, num_layers, norm=None, enable_nested_tensor=True, mask_check=True)`
-            - `num_layers`: 그림의 'N' 
+            - `num_layers`: 그림의 'N'
+
+  - 2. EMAModel
+    - https://github.com/huggingface/diffusers/blob/main/src/diffusers/training_utils.py#L398
+    - model 의 parameter 를 EMA(지수 이동 평균) 를 이용해여 학습 안정성
+    - $$\theta_t^{EMA} <- decay \cdot \theta_{t-1}^{EMA} + (1-decay_ \cdot \theta_t$$
+    - args
+      ```
+      parameters: Iterable[torch.nn.Parameter],
+      decay: float = 0.9999, # 1에 가까울수록 느리게 갱신
+      min_decay: float = 0.0, # use_ema_warmup=True 일 때, decay 하한값
+      update_after_step: int = 0, # 이 값을 지나기 전에는 EMA update 하지 않음
+      use_ema_warmup: bool = False, # decay 작게 시작해서 점점 올리는 스케줄 사용 여부
+      inv_gamma: Union[float, int] = 1.0, # use_ema_warmup=True 일 때, 언제부터 올라갈지 결정 (클수록 느리게)
+      power: Union[float, int] = 2 / 3, # use_ema_warmup=True 일 때, 얼마나 올라갈지 결정 (쿨수록 더 빨리)
+      foreach: bool = False,
+      model_cls: Optional[Any] = None,
+      model_config: Dict[str, Any] = None
+      ```
+    - `optimize.step()` 다음에 `ema.step(model.parameters())`
 
 </br>
 
