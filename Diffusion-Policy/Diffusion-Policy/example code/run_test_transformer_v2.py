@@ -291,26 +291,37 @@ class PolicyRunner(Node):
         """
         if self.gripper_in_trajectory:
             msg = JointTrajectory()
+            
             msg.header = Header()
             msg.header.stamp = self.get_clock().now().to_msg()
             msg.joint_names = self.joint_names + [self.gripper_joint_name]
+            
             pt = JointTrajectoryPoint()
+            
             pt.positions = list(q7.astype(float))
             pt.time_from_start.sec = int(self.move_time)
             pt.time_from_start.nanosec = int((self.move_time - int(self.move_time)) * 1e9)
+            
             msg.points.append(pt)
+            
             self.pub_traj.publish(msg)
+        
         else:
             # Arm 6
             msg = JointTrajectory()
+            
             msg.header = Header()
             msg.header.stamp = self.get_clock().now().to_msg()
             msg.joint_names = self.joint_names
+            
             pt = JointTrajectoryPoint()
+            
             pt.positions = list(q7[:6].astype(float))
             pt.time_from_start.sec = int(self.move_time)
             pt.time_from_start.nanosec = int((self.move_time - int(self.move_time)) * 1e9)
+            
             msg.points.append(pt)
+            
             self.pub_traj.publish(msg)
 
             # Gripper (0.0 ~ 0.8 절대 위치)
