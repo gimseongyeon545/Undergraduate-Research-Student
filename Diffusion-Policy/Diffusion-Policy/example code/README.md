@@ -61,8 +61,6 @@
       입력 (정규화됨)
       ┌─────────────────────────────────────────────────────────────────────────────────┐
       │ obs_rgb   : [B, K, 3, H, W]   │ obs_depth : [B, K, 1, H, W] │ obs_q : [B, K, 7] │
-
-        -> [Batch, K(seq), C(channels), H(height), W(width)]
       └─────────────────────────────────────────────────────────────────────────────────┘
               │                │                         │
               ▼                ▼                         ▼
@@ -123,7 +121,7 @@
   - 2. EMAModel
     - https://github.com/huggingface/diffusers/blob/main/src/diffusers/training_utils.py#L398
     - model 의 parameter 를 EMA(지수 이동 평균) 를 이용해여 학습 안정성
-    - $$\theta_t^{EMA} <- decay \cdot \theta_{t-1}^{EMA} + (1-decay) \cdot \theta_t$$
+    - $$\theta_t^{EMA} &larr decay \cdot \theta_{t-1}^{EMA} + (1-decay_ \cdot \theta_t$$
     - args
       ```
       parameters: Iterable[torch.nn.Parameter],
@@ -156,3 +154,10 @@
 </br>
 
 # `run_test_transformer_v2.py`
+- node name: 'policy_runner'
+- `declare_parameter` 으로 선언된 것 -> `--ros-args -p`
+- `_load_model`: training 시 저장한 최적 parameters load 해서 TransformerJointGripperNoDQ 추론 모델 생성
+- publisher & subscriber 도식화 (with callbacks)
+  ```
+  ```
+- loop (`def tick`)
