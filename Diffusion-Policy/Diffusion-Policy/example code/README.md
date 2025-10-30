@@ -159,9 +159,50 @@
 - node name: 'policy_runner'
 - `declare_parameter` 으로 선언된 것 -> `--ros-args -p`
 - `_load_model`: training 시 저장한 최적 parameters load 해서 TransformerJointGripperNoDQ 추론 모델 생성
-- subscriber
+- [1] subscriber
   |sub|msg type|topic|callback|
   |:--:|:--:|:--:|:--:|
-  |sub_js|JointState|/joint_states|self.cb_joint_states|
-  |sub_rgb|Image|/camera/color/image_raw|self.cb_rgb|
-  |sub_dep|Image|/camera/depth/image_rect_raw|self.cb_depth|
+  |sub_js|JointState|/joint_states|self.`cb_joint_states`|
+  |sub_rgb|Image|/camera/color/image_raw|self.`cb_rgb`|
+  |sub_dep|Image|/camera/depth/image_rect_raw|self.`cb_depth`|
+  - `cb_joint_states`
+    - `self.sub_js = self.create_subscription(JointState, "/joint_states", self.cb_joint_states, 10)`
+      - 해당 topic 을 publish 하는건 bringup 명령어
+    - JointState type 의 msg 를 받아서 q(7) numpy array 에 현재 joint state 담기 (bringup 이 띄워져 있는 동안 sub callback 계속 자동 호출)
+      - `q[j] = float(msg.position[name_to_idx[n]])`
+      - `q[-1] = float(msg.position[name_to_idx[self.gripper_joint_name]])`
+    - `self.q_buf.append(q)`
+      - 최근 `obs_horizon` 만큼 뽑기 위해서 `tick` 함수에서 `q_seq = np.stack(list(self.q_buf)[-self.K:], axis=0)` (`self.K`: obs_horizon)
+  - `cb_rgb`
+    - `self.sub_rgb  = self.create_subscription(Image, self.color_topic, self.cb_rgb, 10)`
+    - resize
+    - `self.rgb_buf.append(arr)`
+    - tick 함수: `rgb_seq = np.stack(list(self.rgb_buf)[-self.K:], axis=0)`
+  - `cb_depth`
+    - `self.sub_dep  = self.create_subscription(Image, self.depth_topic, self.cb_depth, 10)`
+    - resize
+    - `self.dep_buf.append(arr.astype(np.float32))`
+    - tick 함수: `dep_seq = np.stack(list(self.dep_buf)[-self.K:], axis=0)`
+- [2] tick 함수
+  - 1) buf 에서 가장 최근 obs_horizon (self.K) 만큼 뽑기
+    ```
+    rgb_seq = np.stack(list(self.rgb_buf)[-self.K:], axis=0)    
+    dep_seq = np.stack(list(self.dep_buf)[-self.K:], axis=0)    
+    q_seq   = np.stack(list(self.q_buf)[-self.K:], axis=0)      
+    ```
+  - 2) 정규화
+    - rgb seq: 정규화(/255) + tensor 화 (permute)
+    - depth seq: 정규화
+    - q seq: [-1, 1] 정규화
+  - 3) 추론 (TransformerJointGripperNoDQ)
+  - 4) `TransformerJointGripperNoDQ` 반환 값인 예측할 길이 T_p 만큼의 [T, 7] 을 실제 joint 로 denorm -> 가장 처음 t 에서의 7개 joint 만 (T_a = 1)  `q_cmd` -> `_publish` 함수로 publish
+- [3] _publish 함수
+  - 1) `q_cmd` np array 를 인자로 받아서
+  - 2) JointTrajectory: `Header`, `joint_names`, `points` field
+    - JointTrajectoryPoint 를 `points` 필드에 넣기: `msg.points.append(pt)`
+      - positions field: `q_cmd` (`pt.positions = list(q7.astype(float))`)
+  - 3) 완성된 JointTrajectory msg 를 publish (`self.pub_traj.publish(msg)`)
+      |pub|msg type|topic|
+      |:--:|:--:|:--:|
+      |pub_traj|JointTrajectory|/joint_trajectory_controller/joint_trajectory|
+      |pub_grip|GripperCommand|/gripper_controller/command|
