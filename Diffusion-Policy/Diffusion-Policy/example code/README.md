@@ -159,7 +159,9 @@
 - node name: 'policy_runner'
 - `declare_parameter` 으로 선언된 것 -> `--ros-args -p`
 - `_load_model`: training 시 저장한 최적 parameters load 해서 TransformerJointGripperNoDQ 추론 모델 생성
-- publisher & subscriber 도식화 (with callbacks)
-  ```
-  ```
-- loop (`def tick`)
+- subscriber
+  |sub|msg type|topic|callback|
+  |:--:|:--:|:--:|:--:|
+  |sub_js|JointState|/joint_states|self.cb_joint_states|
+  |sub_rgb|Image|/camera/color/image_raw|self.cb_rgb|
+  |sub_dep|Image|/camera/depth/image_rect_raw|self.cb_depth|
