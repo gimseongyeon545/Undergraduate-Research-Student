@@ -202,7 +202,7 @@
     - JointTrajectoryPoint 를 `points` 필드에 넣기: `msg.points.append(pt)`
       - positions field: `q_cmd` (`pt.positions = list(q7.astype(float))`)
   - 3) 완성된 JointTrajectory msg 를 publish (`self.pub_traj.publish(msg)`)
-      |pub|msg type|topic|
-      |:--:|:--:|:--:|
-      |pub_traj|JointTrajectory|/joint_trajectory_controller/joint_trajectory|
-      |pub_grip|GripperCommand|/gripper_controller/command|
+       |pub|msg type|topic|
+       |:--:|:--:|:--:|
+       |pub_traj|JointTrajectory|/joint_trajectory_controller/joint_trajectory|
+       |pub_grip|GripperCommand|/gripper_controller/command|
