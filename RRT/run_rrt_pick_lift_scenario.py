@@ -18,7 +18,7 @@ def main():
     urdfRootPath = pybullet_data.getDataPath()
 
     # 1) Connect to PyBullet simulator in GUI mode
-    client = BulletClient(is_gui=False) # True
+    client = BulletClient(is_gui=True) # False
 
     # 2) Load the Panda robot
     panda = Panda(client=client, pos=(0, 0, 0), quat=(0, 0, 0, 1), use_magic_gripper=False)
